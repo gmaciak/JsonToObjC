@@ -1,0 +1,28 @@
+{
+	"__CLASS_NAME__" : "DataModel",
+	"booleanValue"	:	false,
+	"integerValue"	:	666,
+	"floatValue"		:	33.4,
+	"stringValue"	:	"test",
+	"dateValue"		:	"2012-04-23T18:25:43.511Z",
+	"nullValue"		:	null,
+	"arrayValue"		:	[],
+	"dictionaryValue":	{
+			"caption" : "GenerateCode",
+			"command" : 1
+		},
+	""			:	{},
+	"children":
+	[
+		{
+			"__CLASS_NAME__" : "DataMode2",
+			"__BASE_CLASS_NAME__" : "DataModel",
+			"caption" : "GenerateCode",
+			"command" : 1
+		},
+		{
+			"caption" : "GenerateCodeForARC",
+			"command" : 1.4
+		}
+	]
+}

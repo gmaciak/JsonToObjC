@@ -1,0 +1,47 @@
+{
+	"add_output_templates_to_new_conversion_template" : false,
+
+	"conversion_settings" : {
+		// default model root class
+		"default_root_class"			: "NSObject",
+		"arc_enabled"					: true,
+		"number_as_object"				: false,
+		"boolean_as_object"				: false,
+
+		// use copy instead retain or strong for strings:
+		"copy_as_string_reference_type"	: false,
+
+		// add @synthesize for properties, implicitly synthesized property has ivar name '_propertyName', when explicitly synthesized has ivar name "propertyName"
+		"add_synthesize_clause"			: false,
+
+		"add_standard_copyright_comment": false,
+
+		// optional:
+		"project_name" 					: "__PROJECT_NAME__",
+		"creator" 						: "__CREATOR__",
+		"organization" 					: "__ORGANIZATION__",
+
+		// templates:
+		"copyright_comment_template"	: "//\n//  ${class_name}.h\n//  ${project_name}\n//\n//  Created by ${creator} on ${date}.\n//  Copyright (c) ${year} ${organization}. All rights reserved.\n//\n\n",
+
+		"h_file_template"				: "${copyright}@interface ${class_name} : ${base_class_name}\n\n${properties_declaration}\n-(instancetype)initWithJSON:(NSDictionary*)json;\n\n@end",
+
+		"m_file_template"				: "${copyright}#import \"${class_name}.h\"\n\n@implementation ${class_name}\n\n${synthesizes}${dealloc}\n\n-(id)initWithJSON:(NSDictionary*)${json_dictionary_name} {\n\tself = ${super_init_method};\n\tif (self) {\n${init_content}\t}\n\treturn self;\n}\n\n@end",
+
+		"default_super_init_method_template" : "[super init]",
+		"inherited_super_init_method_template" : "[super initWithJSON:${json_dictionary_name}]",
+
+		// dealloc templates
+		"dealloc_method_template" 				: "\n-(void)dealloc {\n${dealloc_code}\t[super dealloc];\n}",
+
+		"dealloc_reference_removing_template" : "\tself.${name} = nil;\n",
+
+		"property_declaration_template" : "@property(nonatomic,readwrite,${reference_type}) ${type} ${name};\n",
+
+		"synthesize_template" : "@synthesize ${name};\n",
+
+		"property_initialization_template" : "\t\tself.${name} = [${json_dictionary_name} objectForKey:@\"${name}\"];\n",
+
+		"non_object_property_initialization_template" : "\t\tself.${name} = [[${json_dictionary_name} objectForKey:@\"${name}\"] ${value_getter_name}];\n",
+	}
+}

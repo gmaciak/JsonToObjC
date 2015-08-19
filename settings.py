@@ -27,15 +27,15 @@ class ConversionSettings(dict):
             self.addPropeertyNameConstants               = False
             self.leaveSourceJsonAsComment                = True
             self.defaultRootClass                        = "NSObject"
-            self.hFileTemplate                           = ""
-            self.mFileTemplate                           = ""
-            self.commentTemplate                         = ""
-            self.propertyDeclarationTemplate             = ""
-            self.synthesizeTemplate                      = ""
-            self.deallocMethodTemplate                   = ""
-            self.deallocReferenceRemovingTemplate        = ""
-            self.propertyInitializationTemplate          = ""
-            self.nonObjectPropertyInitializationTemplate = ""
+            self.templateHFile                           = ""
+            self.templateMFile                           = ""
+            self.templateComment                         = ""
+            self.templatePropertyDeclaration             = ""
+            self.templateSynthesize                      = ""
+            self.templateDeallocMethod                   = ""
+            self.templateDeallocReferenceRemoving        = ""
+            self.templatePropertyInitialization          = ""
+            self.templateNonObjectPropertyInitialization = ""
             
             for key, value in iter(settings.items()):
                 print("property: {} ({})".format(to_camel_case(key), key))

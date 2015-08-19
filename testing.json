@@ -21,8 +21,17 @@
 			"command" : 1
 		},
 		{
+			"__CLASS_NAME__" : "DataMode3",
+			"__BASE_CLASS_NAME__" : "DataModel",
+			"caption" : "GenerateCode",
+			"command" : 1
+		},
+		{
 			"caption" : "GenerateCodeForARC",
 			"command" : 1.4
+		},
+		{
+
 		}
 	]
 }

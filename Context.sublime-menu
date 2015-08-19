@@ -1,33 +1,32 @@
 [
-{
-    "id" : "JSONToObjC",
-    "caption" : "JSONToObjC",
-    // "command" : "jsontoobjc",
-    "children":
-	[
-		{
-			"caption" : "Start",
-			"command" : "json_to_objc"
-		},
-		{
-			"caption" : "New template",
-			"command" : "new_json_to_objc_window"
-		}
-	]
-},
-{
-        "id": "User_PackageControl",
-        "caption": "Package Control",
-        "children":
+	{
+		"id" : "JSONToObjC",
+		"caption" : "JSONToObjC",
+		"children":
+		[
+			{
+				"caption" : "Generate Models",
+				"command" : "json_to_objc"
+			},
+			{
+				"caption" : "New operation template",
+				"command" : "new_json_to_objc_window"
+			}
+		]
+	},
+	{
+		"id": "User_PackageControl",
+		"caption": "Package Control",
+		"children":
 		[
 			{
 				"caption": "Package Control: Install Package",
-		        "command": "install_package"
+				"command": "install_package"
 			},
 			{
-		        "caption": "Package Control: Uninstall Package",
-		        "command": "remove_package"
-		    }
+				"caption": "Package Control: Uninstall Package",
+				"command": "remove_package"
+			}
 		]
-    }
+	}
 ]

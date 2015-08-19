@@ -22,26 +22,26 @@
 		"organization" 					: "__ORGANIZATION__",
 
 		// templates:
-		"copyright_comment_template"	: "//\n//  ${class_name}.h\n//  ${project_name}\n//\n//  Created by ${creator} on ${date}.\n//  Copyright (c) ${year} ${organization}. All rights reserved.\n//\n\n",
+		"template_copyright_comment"	: "//\n//  ${class_name}.h\n//  ${project_name}\n//\n//  Created by ${creator} on ${date}.\n//  Copyright (c) ${year} ${organization}. All rights reserved.\n//\n\n",
 
-		"h_file_template"				: "${copyright}@interface ${class_name} : ${base_class_name}\n\n${properties_declaration}\n-(instancetype)initWithJSON:(NSDictionary*)json;\n\n@end",
+		"template_h_file"				: "${copyright}#import <Foundation/Foundation.h>\n\n@interface ${class_name} : ${base_class_name}\n\n${properties_declaration}\n-(instancetype)initWithJSON:(NSDictionary*)json;\n\n@end",
 
-		"m_file_template"				: "${copyright}#import \"${class_name}.h\"\n\n@implementation ${class_name}\n\n${synthesizes}${dealloc}\n\n-(id)initWithJSON:(NSDictionary*)${json_dictionary_name} {\n\tself = ${super_init_method};\n\tif (self) {\n${init_content}\t}\n\treturn self;\n}\n\n@end",
+		"template_m_file"				: "${copyright}#import \"${class_name}.h\"\n\n@implementation ${class_name}\n\n${synthesizes}${dealloc}\n\n-(id)initWithJSON:(NSDictionary*)${json_dictionary_name} {\n\tself = ${super_init_method};\n\tif (self) {\n${init_content}\t}\n\treturn self;\n}\n\n@end",
 
-		"default_super_init_method_template" : "[super init]",
-		"inherited_super_init_method_template" : "[super initWithJSON:${json_dictionary_name}]",
+		"template_default_super_init_method" : "[super init]",
+		"template_inherited_super_init_method" : "[super initWithJSON:${json_dictionary_name}]",
 
 		// dealloc templates
-		"dealloc_method_template" 				: "\n-(void)dealloc {\n${dealloc_code}\t[super dealloc];\n}",
+		"template_dealloc_method" 				: "\n-(void)dealloc {\n${dealloc_code}\t[super dealloc];\n}",
 
-		"dealloc_reference_removing_template" : "\tself.${name} = nil;\n",
+		"template_dealloc_reference_removing" : "\tself.${name} = nil;\n",
 
-		"property_declaration_template" : "@property(nonatomic,readwrite,${reference_type}) ${type} ${name};\n",
+		"template_property_declaration" : "@property(nonatomic,readwrite,${reference_type}) ${type} ${name};\n",
 
-		"synthesize_template" : "@synthesize ${name};\n",
+		"template_synthesize" : "@synthesize ${name};\n",
 
-		"property_initialization_template" : "\t\tself.${name} = [${json_dictionary_name} objectForKey:@\"${name}\"];\n",
+		"template_property_initialization" : "\t\tself.${name} = [${json_dictionary_name} objectForKey:@\"${name}\"];\n",
 
-		"non_object_property_initialization_template" : "\t\tself.${name} = [[${json_dictionary_name} objectForKey:@\"${name}\"] ${value_getter_name}];\n",
+		"template_non_object_property_initialization" : "\t\tself.${name} = [[${json_dictionary_name} objectForKey:@\"${name}\"] ${value_getter_name}];\n",
 	}
 }

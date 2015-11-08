@@ -1,53 +1,75 @@
 import os, sys, string, re
 
-SOURCE_KEY_MODEL_CLASS_NAME      = "__CLASS_NAME__"
-SOURCE_KEY_MODEL_BASE_CLASS_NAME = "__BASE_CLASS_NAME__"
-KEY_DESCRIPTOR_SUBDESCRIPTORS    = "subdescriptors"
+SOURCE_KEY_MODEL_CLASS_NAME      = "@CLASS_NAME"
+SOURCE_KEY_MODEL_BASE_CLASS_NAME = "@BASE_CLASS_NAME"
 KEY_SETTINGS_CONVERSION_SETTINGS = "conversion_settings"
+KEY_TEMPLATE_CONVERSION_SETTINGS = "@CONVERSION_SETTINGS"
+KEY_TEMPLATE_MODEL_JSON          = "@MODEL_JSON"
 
 def to_camel_case(s):
-    return s[0].lower() + string.capwords(s, sep='_').replace('_', '')[1:] if s else s
+    if s and len(s) > 0:
+        result = s[0].lower()
+        if len(s) > 1:
+            if "_" in s:
+                result += string.capwords(s, sep='_').replace('_', '')[1:]
+            else:
+                result += s[1:]
+        return result
+    return s
 
 def to_snake_case(s):
     return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s).lower()
+
+def to_pascal_case(s):
+    if s and len(s) > 0:
+        result = s[0].upper()
+        if len(s) > 1: result += to_camel_case(s)[1:]
+        return result
+    return s
 
 class ConversionSettings(dict):
     def __init__(self, settings):
         super(ConversionSettings, self).__init__()
         if type(settings) is dict:
-            self.unknownPropertyName                     = "<#property_name#>"
-            self.unknownClassName                        = "<#class_name#>"
+            self.unknownPropertyName                        = "<#property_name#>"
+            self.unknownClassName                           = "<#class_name#>"
             
-            self.json                                    = settings
-            self.arcEnabled                              = False
-            self.numberAsObject                          = False
-            self.booleanAsObject                         = False
-            self.copyAsStringReferenceType               = False
-            self.addSynthesizeClause                     = True
-            self.addPropeertyNameConstants               = False
-            self.leaveSourceJsonAsComment                = True
-            self.defaultRootClass                        = "NSObject"
-            self.templateHFile                           = ""
-            self.templateMFile                           = ""
-            self.templateComment                         = ""
-            self.templatePropertyDeclaration             = ""
-            self.templateSynthesize                      = ""
-            self.templateDeallocMethod                   = ""
-            self.templateDeallocReferenceRemoving        = ""
-            self.templatePropertyInitialization          = ""
-            self.templateNonObjectPropertyInitialization = ""
+            self.json                                       = settings
+            self.arcEnabled                                 = False
+            self.numberAsObject                             = False
+            self.booleanAsObject                            = False
+            self.allowPropertyKeyAsClassName                = True
+            self.copyAsStringReferenceType                  = False
+            self.addSynthesizeClause                        = True
+            self.addPropeertyNameConstants                  = False
+            self.leaveSourceJsonAsComment                   = True
+            self.defaultRootClass                           = "NSObject"
+            self.defaultRootModelClass                      = None
+            self.templateHFile                              = ""
+            self.templateMFile                              = ""
+            self.templateComment                            = ""
+            self.templatePropertyDeclaration                = ""
+            self.templateSynthesize                         = ""
+            self.templateDeallocMethod                      = ""
+            self.templateDeallocReferenceRemoving           = ""
+            self.templatePropertyInitialization             = ""
+            self.templateNonObjectPropertyInitialization    = ""
+            self.templateArcStrongPropertyInitialization    = ""
+            self.templateArcCopyPropertyInitialization      = ""
+            self.templateArcNonObjectPropertyInitialization = ""
             
             for key, value in iter(settings.items()):
                 print("property: {} ({})".format(to_camel_case(key), key))
                 propertyName = to_camel_case(key)
                 setattr(self, propertyName, value) # if propertyName in vars(self)
 
-            self.initArgumentName = "json_" if self.addSynthesizeClause else "json"
-            self.weakRefName = "weak" if self.arcEnabled else "assign"
-            self.strongRefName = "strong" if self.arcEnabled else "retain"
+            self.initArgumentName = "json_"     if self.addSynthesizeClause else "json"
+            self.weakRefName      = "weak"      if self.arcEnabled else "assign"
+            self.strongRefName    = "strong"    if self.arcEnabled else "retain"
+            self.copyRefName      = "copy"
 
     def __getattr__(self, key):
-        return self[key]
+        return self[key] if key in self else None
 
     def __setattr__(self, key, value):
         self[key] = value
@@ -76,22 +98,21 @@ class PropertyDescriptor(Default):
     """docstring for PropertyDescriptor"""
     def __init__(self, name, value, settings):
         super(PropertyDescriptor, self).__init__()
-        self.name = name
+        self.jsonKey = name;
+        self.name = to_camel_case(name) if not name.startswith("@") else name
         self.value = value
         self.valueType = type(value)
-
+        print("property: %s = %s (%s)",name,value,self.valueType)
         if self.valueType is list:
             self.referenceType = settings.strongRefName
             self.type       = "NSArray*"
-            # descriptor[KEY_DESCRIPTOR_SUBDESCRIPTORS]   = self.propertyDescriptorsForJSON(value)
 
         elif self.valueType is dict:
             self.referenceType   = settings.strongRefName
             self.type       = "NSDictionary*"
-            # descriptor[KEY_DESCRIPTOR_SUBDESCRIPTORS]   = self.propertyDescriptorsForJSON(value)
 
         elif self.valueType is str:
-            self.referenceType   = "copy" if settings.copyAsStringReferenceType else settings.strongRefName
+            self.referenceType   = settings.copyRefName if settings.copyAsStringReferenceType else settings.strongRefName
             self.type       = "NSString*"
 
         elif self.valueType is int:
@@ -102,7 +123,7 @@ class PropertyDescriptor(Default):
                 self.valueGetterName = "integerValue"
                 self.referenceType   = settings.weakRefName
                 self.type       = "NSInteger"
-                if len(self.deallocReferenceRemoving):
+                if self.deallocReferenceRemoving and len(self.deallocReferenceRemoving):
                     self.deallocReferenceRemoving = ""
 
         elif self.valueType is float:
@@ -113,7 +134,7 @@ class PropertyDescriptor(Default):
                 self.valueGetterName = "floatValue"
                 self.referenceType   = settings.weakRefName
                 self.type       = "CGFloat"
-                if len(self.deallocReferenceRemoving):
+                if self.deallocReferenceRemoving and len(self.deallocReferenceRemoving):
                     self.deallocReferenceRemoving = ""
 
         elif self.valueType is bool:
@@ -124,7 +145,7 @@ class PropertyDescriptor(Default):
                 self.valueGetterName = "boolValue"
                 self.referenceType   = settings.weakRefName
                 self.type       = "BOOL"
-                if len(self.deallocReferenceRemoving):
+                if self.deallocReferenceRemoving and len(self.deallocReferenceRemoving):
                     self.deallocReferenceRemoving = ""
 
         else:
@@ -132,7 +153,7 @@ class PropertyDescriptor(Default):
             self.type       = "id"
 
     def __getattr__(self, key):
-        return self[key]
+        return self[key] if key in self else None
 
     def __setattr__(self, key, value):
         self[key] = value

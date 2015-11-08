@@ -4,9 +4,18 @@
 	"conversion_settings" : {
 		// default model root class
 		"default_root_class"			: "NSObject",
+
+		// class of main json object used if optional
+		// @CLASS_NAME key in main json object is not defined 
+		"default_root_model_class"		: "RootModel",
 		"arc_enabled"					: true,
 		"number_as_object"				: false,
 		"boolean_as_object"				: false,
+
+		// use property key istead of default model class name
+		// (which is xcode snipped token <#class_name#>)
+		// if @CLASS_NAME not defined
+		"allow_property_key_as_class_name" : true,
 
 		// use copy instead retain or strong for strings:
 		"copy_as_string_reference_type"	: false,
@@ -14,7 +23,7 @@
 		// add @synthesize for properties, implicitly synthesized property has ivar name '_propertyName', when explicitly synthesized has ivar name "propertyName"
 		"add_synthesize_clause"			: false,
 
-		"add_standard_copyright_comment": false,
+		"add_standard_copyright_comment": true,
 
 		// optional:
 		"project_name" 					: "__PROJECT_NAME__",
@@ -26,7 +35,7 @@
 
 		"template_h_file"				: "${copyright}#import <Foundation/Foundation.h>\n\n@interface ${class_name} : ${base_class_name}\n\n${properties_declaration}\n-(instancetype)initWithJSON:(NSDictionary*)json;\n\n@end",
 
-		"template_m_file"				: "${copyright}#import \"${class_name}.h\"\n\n@implementation ${class_name}\n\n${synthesizes}${dealloc}\n\n-(id)initWithJSON:(NSDictionary*)${json_dictionary_name} {\n\tself = ${super_init_method};\n\tif (self) {\n${init_content}\t}\n\treturn self;\n}\n\n@end",
+		"template_m_file"				: "${copyright}#import \"${class_name}.h\"\n\n@implementation ${class_name}\n\n${synthesizes}${dealloc}-(id)initWithJSON:(NSDictionary*)${json_dictionary_name} {\n\tself = ${super_init_method};\n\tif (self) {\n${init_content}\t}\n\treturn self;\n}\n\n@end",
 
 		"template_default_super_init_method" : "[super init]",
 		"template_inherited_super_init_method" : "[super initWithJSON:${json_dictionary_name}]",
@@ -40,8 +49,11 @@
 
 		"template_synthesize" : "@synthesize ${name};\n",
 
-		"template_property_initialization" : "\t\tself.${name} = [${json_dictionary_name} objectForKey:@\"${name}\"];\n",
+		"template_property_initialization" : "\t\tself.${name} = [${json_dictionary_name} objectForKey:@\"${json_key}\"];\n",
+		"template_non_object_property_initialization" : "\t\tself.${name} = [[${json_dictionary_name} objectForKey:@\"${json_key}\"] ${value_getter_name}];\n",
 
-		"template_non_object_property_initialization" : "\t\tself.${name} = [[${json_dictionary_name} objectForKey:@\"${name}\"] ${value_getter_name}];\n",
+		"template_arc_strong_property_initialization" : "\t\t${ivar} = [${json_dictionary_name} objectForKey:@\"${json_key}\"];\n",
+		"template_arc_copy_property_initialization" : "\t\t${ivar} = [[${json_dictionary_name} objectForKey:@\"${json_key}\"] copy];\n",
+		"template_arc_non_object_property_initialization" : "\t\t${ivar} = [[${json_dictionary_name} objectForKey:@\"${json_key}\"] ${value_getter_name}];\n",
 	}
 }

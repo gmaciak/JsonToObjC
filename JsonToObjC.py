@@ -12,44 +12,41 @@ def pretty_printed(value):
 	return sublime.encode_value(value, True)
 
 class NewJsonToObjcWindowCommand(sublime_plugin.TextCommand):
+
 	def addModelNamesToJson(self, json, className = None):
 		if className:
-			if "_" in className:
-				className = settings.to_camel_case(className);
-			className = className[0].upper() + className[1:] if len(className) > 1 else None
+			className = settings.to_pascal_case(className)
 		if type(json) is dict:
 			for key in json:
 				self.addModelNamesToJson(json[key], key)
 			if settings.SOURCE_KEY_MODEL_CLASS_NAME not in json:
-				json[settings.SOURCE_KEY_MODEL_CLASS_NAME] = className if className else "<#class_name#>"
+				json[settings.SOURCE_KEY_MODEL_CLASS_NAME] = className if className else self.conversionSettings.unknownClassName
 			if settings.SOURCE_KEY_MODEL_BASE_CLASS_NAME not in json:
 				json[settings.SOURCE_KEY_MODEL_BASE_CLASS_NAME] = self.conversionSettings.defaultRootClass
-		elif type(json) is list:
-			for value in json:
-				self.addModelNamesToJson(value)
 
-	def removeInvalidValuesAndKeys(self, json):
+	def compressListToOneObject(self, listObj):
+		modelDict = dict()
+		for value in listObj:
+			if type(value) is dict:
+				modelDict.update(value)
+		return modelDict if len(modelDict) else None
+
+	def compressJson(self, json):
+		if type(json) is dict:
+			for key in json:
+				value = json[key]
+				if type(value) is list:
+					pass
+				self.compressJson(json[key])
+		elif type(json) is list:
+			result =self.compressListToOneObject(json) 
+			result = self.templateJson(result)
+		return result if result and len(result) else None
+
+	def validateValuesAndKeys(self, json):
 		if type(json) is dict:
 			keysToRemove = list()
 			if "" in json: del json[""]
-			for key in json:
-				subjson = json[key]
-				if (type(subjson) is list or type(subjson) is dict) and len(subjson) == 0:
-					print("{} of type {}, len: {}".format(key, type(subjson), len(subjson)))
-					keysToRemove.append(key)
-				else:
-					self.removeInvalidValuesAndKeys(subjson)
-			for key in keysToRemove: del json[key]
-
-		elif type(json) is list:
-			indexesToRemove = list()
-			for index, subjson in enumerate(json):
-				if (type(subjson) is list or type(subjson) is dict) and len(subjson) == 0:
-					indexesToRemove.append(index)
-				else:
-					self.removeInvalidValuesAndKeys(subjson)
-			for i in reversed(indexesToRemove): del json[i]
-
 
 	def run(self, edit):
 		# settings dictionary
@@ -57,7 +54,7 @@ class NewJsonToObjcWindowCommand(sublime_plugin.TextCommand):
 		self.conversionSettings = settings.ConversionSettings(settingsJSON)
 
 		# remove templateS from conversion template
-		if not self.view.settings().get("add_output_templateS_to_new_conversion_template", True):
+		if not self.view.settings().get("add_output_templates_to_new_conversion_template"):
 			for key in list(settingsJSON.keys()):
 				print("key: {}".format(key))
 				if key.startswith("template"):
@@ -73,13 +70,18 @@ class NewJsonToObjcWindowCommand(sublime_plugin.TextCommand):
 			if text.startswith("{") or text.startswith("["):
 				jsonObj = sublime.decode_value(text)
 				if jsonObj:
-					if settings.KEY_SETTINGS_CONVERSION_SETTINGS not in jsonObj:
-						model_json = pretty_printed(jsonObj)
-					elif "model_json" in jsonObj:
-						jsonObj = jsonObj["model_json"]	
-				self.removeInvalidValuesAndKeys(jsonObj)
-				self.addModelNamesToJson(jsonObj, "RootModel")
-				model_json = pretty_printed(jsonObj)
+					if settings.KEY_TEMPLATE_CONVERSION_SETTINGS in jsonObj:
+						if settings.KEY_TEMPLATE_MODEL_JSON in jsonObj:
+							jsonObj = jsonObj[settings.KEY_TEMPLATE_MODEL_JSON]
+						else:
+							message = str("'Invalid json !!!"
+							"\n\tJSON contains {} key but {} key is missing."
+							"\n\tPlease try to generate template again using source json'").format(settings.KEY_TEMPLATE_CONVERSION_SETTINGS,settings.KEY_TEMPLATE_MODEL_JSON)
+							raise ValueError(message)
+					self.validateValuesAndKeys(jsonObj)
+					jsonObj = self.templateJson(jsonObj)
+					self.addModelNamesToJson(jsonObj, self.conversionSettings.defaultRootModelClass)
+					model_json = pretty_printed(jsonObj)
 
 		# new view
 		newFileView = self.view.window().new_file()
@@ -87,15 +89,18 @@ class NewJsonToObjcWindowCommand(sublime_plugin.TextCommand):
 
 		# template text
 		templateString = """{
-	"${settings_key}" : ${settings},
-	// add key "__CLASS_NAME__" to each json dictionary to define model class name
-	// add key "__BASE_CLASS_NAME__" to each json dictionary to define model base
+	"${settings_token}" : ${settings},
+	// add key "${class_name_token}" to each json dictionary to define model class name
+	// add key "${base_class_name_token}" to each json dictionary to define model base
 	// class name (default model base class is NSObject)
-	"model_json" : ${json}
+	"${model_json_token}" : ${json}
 }"""
 		tokensMap = settings.TokensMap()
-		tokensMap.settingsKey = settings.KEY_SETTINGS_CONVERSION_SETTINGS
+		tokensMap.settingsToken = settings.KEY_TEMPLATE_CONVERSION_SETTINGS
 		tokensMap.settings = pretty_printed(settingsJSON).rstrip().replace("\n","\n\t")
+		tokensMap.classNameToken = settings.SOURCE_KEY_MODEL_CLASS_NAME
+		tokensMap.baseClassNameToken = settings.SOURCE_KEY_MODEL_BASE_CLASS_NAME
+		tokensMap.modelJsonToken = settings.KEY_TEMPLATE_MODEL_JSON
 		tokensMap.json = model_json.replace("\n","\n\t")
 		templateContent = string.Template(templateString).substitute(tokensMap)
 
@@ -104,18 +109,22 @@ class NewJsonToObjcWindowCommand(sublime_plugin.TextCommand):
 class JsonToObjcCommand(sublime_plugin.TextCommand):
 
 	def propertyDescriptorsForJSON(self, json):
-		descriptors = dict()
+		descriptors = list()
 		if type(json) is list and len(json) > 0:
-			temp_descirptors = dict()
-			for value in json:
-				item_descriptors = self.propertyDescriptorsForJSON(value)
-				for key in item_descriptors:
-					if key not in temp_descirptors: temp_descirptors[key] = item_descriptors[key]
+			for obj in json:
+				print("array subitem: {}",obj)
+				item_descriptors = self.propertyDescriptorsForJSON(obj)
+				for item in item_descriptors:
+					key = item.jsonKey
+					keys = [obj.jsonKey for obj in descriptors]
+					if key not in keys:
+						print("array item added to descriptors: ",key,item)
+						descriptors.append(item)
 		elif type(json) is dict and len(json) > 0:
 			for key in json:
 				if key == "": continue
 				value = json[key]
-				descriptors[key] = settings.PropertyDescriptor(key, value, self.conversionSettings)
+				descriptors.append(settings.PropertyDescriptor(key, value, self.conversionSettings))
 		return descriptors 
 
 	def defaultTokensMap(self, className):
@@ -136,45 +145,65 @@ class JsonToObjcCommand(sublime_plugin.TextCommand):
 			defaultMap.copyright = ""
 		return defaultMap
 
-	def interfaceCode(self, descriptors, className):
+	def interfaceCode(self, descriptors, className, baseClassName = None):
 		propertiesDeclaration 	= str()
 		tokensMap = settings.TokensMap()
-		for key in descriptors:
-			descriptor = descriptors[key]
+		for descriptor in descriptors:
 			tokensMap.referenceType = descriptor.referenceType
 			tokensMap.type = descriptor.type
-			tokensMap.name = key
+			tokensMap.name = descriptor.name
 			propertiesDeclaration += string.Template(self.conversionSettings.templatePropertyDeclaration).safe_substitute(tokensMap)
-		if propertiesDeclaration == "": propertiesDeclaration = "// No properties"
+		if propertiesDeclaration == "":
+			propertiesDeclaration = "// No properties"
+
+		# replacements
 		replacements = self.defaultTokensMap(className)
+		if baseClassName:
+			replacements.baseClassName = baseClassName
 		replacements.propertiesDeclaration = propertiesDeclaration
-		print("Interface replacements: {}".format(replacements))
+		#print("Interface replacements: {}".format(replacements))
 		return string.Template(self.conversionSettings.templateHFile).safe_substitute(replacements)
 
-	def implementationCode(self, descriptors, className, isBaseClassDefault = True):
+	def implementationCode(self, descriptors, className, isSubclassOfKnownModel = True):
 		syntesizeSection = str()
 		initSection = str()
 		deallocSection = str()
 		initTokensMap = settings.TokensMap()
 		initTokensMap.jsonDictionaryName = self.conversionSettings.initArgumentName
 		templateInit = ""
-		for key in descriptors:
-			descriptor = descriptors[key]
-			initTokensMap.name = key
+		for descriptor in descriptors:
+			initTokensMap.name = descriptor.name
+			initTokensMap.jsonKey = descriptor.jsonKey
+			if self.conversionSettings.addSynthesizeClause:
+				initTokensMap.ivar = descriptor.name
+			else:
+				initTokensMap.ivar = "_{}".format(descriptor.name)
 			if self.conversionSettings.addSynthesizeClause:
 				syntesizeSection += string.Template(self.conversionSettings.templateSynthesize).safe_substitute(initTokensMap)
 			
 			initTokensMap.valueGetterName = descriptor.valueGetterName
 			if (((descriptor.valueType is int or descriptor.valueType is float) and not self.conversionSettings.numberAsObject) or
 				(descriptor.valueType is bool and not self.conversionSettings.booleanAsObject)):
-				templateInit = self.conversionSettings.templateNonObjectPropertyInitialization
+				if self.conversionSettings.arcEnabled:
+					templateInit = self.conversionSettings.templateArcNonObjectPropertyInitialization
+				else:
+					templateInit = self.conversionSettings.templateNonObjectPropertyInitialization
 			else:
-				templateInit = self.conversionSettings.templatePropertyInitialization
+				if self.conversionSettings.arcEnabled:
+					if descriptor.referenceType == self.conversionSettings.copyRefName:
+						templateInit = self.conversionSettings.templateArcCopyPropertyInitialization
+					else:
+						templateInit = self.conversionSettings.templateArcStrongPropertyInitialization
+				else:
+					templateInit = self.conversionSettings.templatePropertyInitialization
 				deallocSection += string.Template(self.conversionSettings.templateDeallocReferenceRemoving).safe_substitute(initTokensMap)
 			initSection += string.Template(templateInit).safe_substitute(initTokensMap)
 
 		replacements = self.defaultTokensMap(className)
-		replacements.synthesizes = syntesizeSection
+		if self.conversionSettings.addSynthesizeClause:
+			replacements.synthesizes = "{}\n\n".format(syntesizeSection)
+		else:
+			replacements.synthesizes = ""
 		replacements.jsonDictionaryName = self.conversionSettings.initArgumentName
 		replacements.initContent = initSection
 		replacements.deallocCode = deallocSection
@@ -184,16 +213,16 @@ class JsonToObjcCommand(sublime_plugin.TextCommand):
 		
 		# super method code
 		tokensMap = settings.TransparentTokensMap()
-		if isBaseClassDefault:
-			tokensMap.superInitMethod = self.conversionSettings.templateDefaultSuperInitMethod
-		else:
+		if isSubclassOfKnownModel:
 			tokensMap.superInitMethod = self.conversionSettings.templateInheritedSuperInitMethod
+		else:
+			tokensMap.superInitMethod = self.conversionSettings.templateDefaultSuperInitMethod
 		
 		# dealloc method code
 		if self.conversionSettings.arcEnabled:
 			tokensMap.dealloc = ""
 		else:
-			tokensMap.dealloc = self.conversionSettings.templateDeallocMethod
+			tokensMap.dealloc = "{}\n\n".format(self.conversionSettings.templateDeallocMethod)
 
 		print("Implementation tokensMap: {}".format(tokensMap))
 
@@ -205,16 +234,15 @@ class JsonToObjcCommand(sublime_plugin.TextCommand):
 		return templateFile.safe_substitute(replacements)
 
 	def popDescriptorPropertyValue(self, descriptors, propertyName):
-		result = ""
-		for key in descriptors:
-			descriptor = descriptors[key]
-			if key == propertyName:
+		result = None
+		for descriptor in descriptors:
+			if descriptor.jsonKey == propertyName:
 				result = descriptor.value
-				del(descriptors[key])
+				descriptors.remove(descriptor)
 				break
 		return result;
 
-	def generateFiles(self, edit, jsonObj):
+	def generateFiles(self, edit, jsonKey, jsonObj):
 		# json descriptors
 		descriptors = self.propertyDescriptorsForJSON(jsonObj)
 		if len(descriptors) > 0:
@@ -223,45 +251,49 @@ class JsonToObjcCommand(sublime_plugin.TextCommand):
 			className = self.popDescriptorPropertyValue(
 				descriptors,
 				settings.SOURCE_KEY_MODEL_CLASS_NAME)
+			print("className: ", className)
+			if (className is None
+				and self.conversionSettings.allowPropertyKeyAsClassName
+				and jsonKey is not None):
+				className = settings.to_pascal_case(jsonKey)
 
-			isBaseClassDefault = True
 			baseClassName = self.popDescriptorPropertyValue(
 				descriptors,
 				settings.SOURCE_KEY_MODEL_BASE_CLASS_NAME)
 
-			if baseClassName == "":
+			isSubclassOfKnownModel = False
+			if not baseClassName:
 				baseClassName = self.conversionSettings.defaultRootClass
-			else:
-				isBaseClassDefault = False
+			elif baseClassName in self.knownModels:
+				isSubclassOfKnownModel = True
 
 			# Interface
-			code = self.interfaceCode(descriptors, className)
+			code = self.interfaceCode(descriptors, className, baseClassName)
 			
 			newFileView = self.view.window().new_file()
 			newFileView.insert(edit, 0, code)
 
-			if className != self.conversionSettings.unknownClassName:
+			if className and className != self.conversionSettings.unknownClassName:
 				newFileView.set_name("{}.h".format(className))
+				self.knownModels.append(className)
 
 			# Implementation
-			code = self.implementationCode(descriptors, className, isBaseClassDefault)
+			code = self.implementationCode(descriptors, className, isSubclassOfKnownModel)
 
 			newFileView = self.view.window().new_file()
 			newFileView.insert(edit, 0, code)
 
-			if className != self.conversionSettings.unknownClassName:
+			if className and className != self.conversionSettings.unknownClassName:
 				newFileView.set_name("{}.m".format(className))
 
-			for key in descriptors:
-				descriptor = descriptors[key]
+			for descriptor in descriptors:
 				if "value" in descriptor:
 					value = descriptor.value
 					if type(value) is dict or type(value) is list:
-						self.generateFiles(edit, value)
+						self.generateFiles(edit, descriptor.jsonKey, value)
 
 	def run(self, edit):
-		# self.logBasicEnviromentProperties()
-		
+		self.knownModels = list()
 
 		allContentRegion = sublime.Region(0, self.view.size())
 		if not allContentRegion.empty():
@@ -276,13 +308,13 @@ class JsonToObjcCommand(sublime_plugin.TextCommand):
 
 			# direct settings dictionary from processed json file
 			if  type(jsonObj) is dict:
-				if settings.KEY_SETTINGS_CONVERSION_SETTINGS in jsonObj:
-					explicit_settings = jsonObj[settings.KEY_SETTINGS_CONVERSION_SETTINGS]
-					for key in explicit_settings:
-						settingsJSON[key] = explicit_settings[key]
-					jsonObj = jsonObj["model_json"]
+				if settings.KEY_TEMPLATE_CONVERSION_SETTINGS in jsonObj:
+					explicit_settings = jsonObj[settings.KEY_TEMPLATE_CONVERSION_SETTINGS]
+					if explicit_settings:
+						settingsJSON.update(explicit_settings)
+					jsonObj = jsonObj[settings.KEY_TEMPLATE_MODEL_JSON]
 
 			# plugin settings object
 			self.conversionSettings = settings.ConversionSettings(settingsJSON)
 
-			self.generateFiles(edit, jsonObj)
+			self.generateFiles(edit, self.conversionSettings.defaultRootModelClass, jsonObj)

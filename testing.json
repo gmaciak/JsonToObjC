@@ -1,30 +1,34 @@
 {
-	"__CLASS_NAME__" : "DataModel",
-	"booleanValue"	:	false,
-	"integerValue"	:	666,
-	"floatValue"		:	33.4,
-	"stringValue"	:	"test",
-	"dateValue"		:	"2012-04-23T18:25:43.511Z",
-	"nullValue"		:	null,
-	"arrayValue"		:	[],
-	"dictionaryValue":	{
-			"caption" : "GenerateCode",
-			"command" : 1
-		},
+	//"@CLASS_NAME"      : "DataModel",
+	"boolean_value"     : false,
+	"integer_value"     : 666,
+	"float_value"      : 33.4,
+	"stringValue"      : "test",
+	"dateValue"        : "2012-04-23T18:25:43.511Z",
+	"null_value"        : null,
+	"arrayValue"       : [],
+	"dictionary_value" : {
+		"@BASE_CLASS_NAME" : "RootModel",
+		"caption" : "GenerateCode",
+		"command" : 1
+	},
 	""			:	{},
 	"children":
 	[
 		{
-			"__CLASS_NAME__" : "DataMode2",
-			"__BASE_CLASS_NAME__" : "DataModel",
+			"@CLASS_NAME" : "DataMode2",
+			"@BASE_CLASS_NAME" : "DataModel",
 			"caption" : "GenerateCode",
 			"command" : 1
 		},
 		{
-			"__CLASS_NAME__" : "DataMode3",
-			"__BASE_CLASS_NAME__" : "DataModel",
+			"@CLASS_NAME" : "DataMode3",
+			"@BASE_CLASS_NAME" : "DataModel",
 			"caption" : "GenerateCode",
-			"command" : 1
+			"command" : 1,
+			"user_defaults" : {
+				"some_property" : "some value"
+			}
 		},
 		{
 			"caption" : "GenerateCodeForARC",

@@ -1,0 +1,31 @@
+[
+    {
+        "id": "preferences", 
+        "children": [
+            {
+                "id": "package-settings", 
+                "children": [
+                    {
+                        "caption": "JSON to Objective-C", 
+                        "children": [
+                            {
+                                "caption": "Settings – Default", 
+                                "args": {
+                                    "file": "${packages}/Pretty JSON/Base File.sublime-settings"
+                                }, 
+                                "command": "open_file"
+                            }, 
+                            {
+                                "caption": "Settings – User", 
+                                "args": {
+                                    "file": "${packages}/User/Base File.sublime-settings"
+                                }, 
+                                "command": "open_file"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+]

@@ -1,6 +1,4 @@
 {
-	"add_output_templates_to_new_conversion_template" : false,
-
 	"conversion_settings" : {
 		// default model root class
 		"default_root_class"			: "NSObject",
@@ -17,43 +15,52 @@
 		// if @CLASS_NAME not defined
 		"allow_property_key_as_class_name" : true,
 
+		// by default property names are created from keys by converting to camel case and removeing undersocres
+		"use_json_keys_as_property_names" : false,
+
 		// use copy instead retain or strong for strings:
 		"copy_as_string_reference_type"	: false,
 
 		// add @synthesize for properties, implicitly synthesized property has ivar name '_propertyName', when explicitly synthesized has ivar name "propertyName"
-		"add_synthesize_clause"			: false,
+		"add_synthesize_clause"			: true,
 
 		"add_standard_copyright_comment": true,
+
+		"sort_properties_by_name"		: true,
+
+		// Templates. If you change them do it carefully:
+		"template_h_file"				: "${copyright}#import <Foundation/Foundation.h>\n\nNS_ASSUME_NONNULL_BEGIN\n@interface ${class_name} : ${base_class_name}\n\n${properties_declaration}\n${designed_initializer}@end\nNS_ASSUME_NONNULL_END",
+
+		"template_h_copyright_comment"	: "//\n//  ${class_name}.h\n//  ${project_name}\n//\n//  Created by ${creator} on ${date}.\n//  Copyright (c) ${year} ${organization}. All rights reserved.\n//\n\n",
+
+		"template_h_property" : "@property(${reference_type}) ${type} ${name};\n",
+
+		"template_h_designed_initializer" : "-(instancetype)initWithJSON:(nullable NSDictionary*)json;\n\n",
+
+		"template_m_file"				: "${copyright}#import \"${class_name}.h\"\n\n@implementation ${class_name}\n\n${synthesizes}${dealloc}-(id)initWithJSON:(NSDictionary*)${json_dictionary_name} {\n\tself = ${super_init_method};\n\tif (self) {\n${init_content}\t}\n\treturn self;\n}\n\n@end",
+
+		"template_m_copyright_comment"	: "//\n//  ${class_name}.m\n//  ${project_name}\n//\n//  Created by ${creator} on ${date}.\n//  Copyright (c) ${year} ${organization}. All rights reserved.\n//\n\n",
+
+		"template_m_default_super_init_method" : "[super init]",
+		"template_m_inherited_super_init_method" : "[super initWithJSON:${json_dictionary_name}]",
+
+		// dealloc templates
+		"template_m_dealloc_method" 				: "-(void)dealloc {\n${dealloc_code}\t[super dealloc];\n}\n\n",
+
+		"template_m_dealloc_reference_removing" : "\tself.${name} = nil;\n",
+
+		"template_m_synthesize" : "@synthesize ${name};\n",
+
+		"template_m_property_initialization" : "\t\tself.${name} = [${json_dictionary_name} objectForKey:@\"${json_key}\"];\n",
+		"template_m_non_object_property_initialization" : "\t\tself.${name} = [[${json_dictionary_name} objectForKey:@\"${json_key}\"] ${value_getter_name}];\n",
+
+		"template_m_arc_strong_property_initialization" : "\t\t${ivar} = [${json_dictionary_name} objectForKey:@\"${json_key}\"];\n",
+		"template_m_arc_copy_property_initialization" : "\t\t${ivar} = [[${json_dictionary_name} objectForKey:@\"${json_key}\"] copy];\n",
+		"template_m_arc_non_object_property_initialization" : "\t\t${ivar} = [[${json_dictionary_name} objectForKey:@\"${json_key}\"] ${value_getter_name}];\n",
 
 		// optional:
 		"project_name" 					: "__PROJECT_NAME__",
 		"creator" 						: "__CREATOR__",
 		"organization" 					: "__ORGANIZATION__",
-
-		// templates:
-		"template_copyright_comment"	: "//\n//  ${class_name}.h\n//  ${project_name}\n//\n//  Created by ${creator} on ${date}.\n//  Copyright (c) ${year} ${organization}. All rights reserved.\n//\n\n",
-
-		"template_h_file"				: "${copyright}#import <Foundation/Foundation.h>\n\n@interface ${class_name} : ${base_class_name}\n\n${properties_declaration}\n-(instancetype)initWithJSON:(NSDictionary*)json;\n\n@end",
-
-		"template_m_file"				: "${copyright}#import \"${class_name}.h\"\n\n@implementation ${class_name}\n\n${synthesizes}${dealloc}-(id)initWithJSON:(NSDictionary*)${json_dictionary_name} {\n\tself = ${super_init_method};\n\tif (self) {\n${init_content}\t}\n\treturn self;\n}\n\n@end",
-
-		"template_default_super_init_method" : "[super init]",
-		"template_inherited_super_init_method" : "[super initWithJSON:${json_dictionary_name}]",
-
-		// dealloc templates
-		"template_dealloc_method" 				: "\n-(void)dealloc {\n${dealloc_code}\t[super dealloc];\n}",
-
-		"template_dealloc_reference_removing" : "\tself.${name} = nil;\n",
-
-		"template_property_declaration" : "@property(nonatomic,readwrite,${reference_type}) ${type} ${name};\n",
-
-		"template_synthesize" : "@synthesize ${name};\n",
-
-		"template_property_initialization" : "\t\tself.${name} = [${json_dictionary_name} objectForKey:@\"${json_key}\"];\n",
-		"template_non_object_property_initialization" : "\t\tself.${name} = [[${json_dictionary_name} objectForKey:@\"${json_key}\"] ${value_getter_name}];\n",
-
-		"template_arc_strong_property_initialization" : "\t\t${ivar} = [${json_dictionary_name} objectForKey:@\"${json_key}\"];\n",
-		"template_arc_copy_property_initialization" : "\t\t${ivar} = [[${json_dictionary_name} objectForKey:@\"${json_key}\"] copy];\n",
-		"template_arc_non_object_property_initialization" : "\t\t${ivar} = [[${json_dictionary_name} objectForKey:@\"${json_key}\"] ${value_getter_name}];\n",
 	}
 }

@@ -1,32 +1,66 @@
 [
 	{
-		"id" : "JSONToObjC",
-		"caption" : "JSONToObjC",
+		"id" : "json_to_objc",
+		"caption" : "JSON to Objective-C",
 		"children":
 		[
+			{
+				"id" : "json_to_objc_convert_case",
+				"caption" : "Convert Case",
+				"children":
+				[
+					{
+						"caption" : "Snake Case",
+						"command" : "json_to_objc_snake_case"
+					},
+					{
+						"caption" : "Camel Case",
+						"command" : "json_to_objc_camel_case"
+					},
+					{
+						"caption" : "Pascal Case",
+						"command" : "json_to_objc_pascal_case"
+					}
+				]
+			},
+			// {
+			// 	"caption" : "Pretty Print (sublime build-in style)",
+			// 	"command" : "json_to_objc_pretty_print"
+			// },
 			{
 				"caption" : "Generate Models",
 				"command" : "json_to_objc"
 			},
 			{
-				"caption" : "New operation template",
-				"command" : "new_json_to_objc_window"
-			}
-		]
-	},
-	{
-		"id": "User_PackageControl",
-		"caption": "Package Control",
-		"children":
-		[
-			{
-				"caption": "Package Control: Install Package",
-				"command": "install_package"
+				"caption" : "New conversion template file",
+				"command" : "json_to_objc_new_template",
+				"args": {
+			      "add_output_templates_to_new_conversion_template": true
+			    }
 			},
 			{
-				"caption": "Package Control: Uninstall Package",
-				"command": "remove_package"
+				"caption" : "New conversion template file with settings only",
+				"command" : "json_to_objc_new_template"
 			}
 		]
 	}
+	// ,{
+	// 	"id": "json_to_objc_package_control",
+	// 	"caption": "Package Control",
+	// 	"children":
+	// 	[
+	// 		{
+	// 			"caption": "Package Control: Install Package",
+	// 			"command": "install_package"
+	// 		},
+	// 		{
+	// 			"caption": "Package Control: Uninstall Package",
+	// 			"command": "remove_package"
+	// 		},
+	// 		{
+	// 			"caption": "Package Control: Create Package",
+	// 			"command": "create_package"
+	// 		}
+	// 	]
+	// }
 ]

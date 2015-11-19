@@ -1,41 +1,63 @@
 {
-	//"@CLASS_NAME"      : "DataModel",
+	// Default root class name used if @CLASS_NAME key is not defined is in
+	// [sublime-settings]/conversion_settings/default_root_model_class
+	//"@CLASS_NAME"      : "RootModelFromJSON",
+
+	// Default root class name used if @BASE_CLASS_NAME key is not defined is in
+	// [sublime-settings]/conversion_settings/default_root_class
+	//"@BASE_CLASS_NAME" : "DataModel",
 	"boolean_value"     : false,
 	"integer_value"     : 666,
-	"float_value"      : 33.4,
-	"stringValue"      : "test",
-	"dateValue"        : "2012-04-23T18:25:43.511Z",
+	"float_value"      	: 33.4,
+	"stringValue"      	: "test",
+	"dateValue"        	: "2012-04-23T18:25:43.511Z",
+	// key with null value is converted to nullable property
 	"null_value"        : null,
-	"arrayValue"       : [],
-	"dictionary_value" : {
-		"@BASE_CLASS_NAME" : "RootModel",
+	// models for items of empty array will not be generated
+	"list"       		: [],
+	"base_json_object" 		: {
+		"@CLASS_NAME" : "DataModel",
 		"caption" : "GenerateCode",
 		"command" : 1
 	},
-	""			:	{},
+	"json_object" 		: {
+		"@BASE_CLASS_NAME" : "DataModel",
+		"caption" : "GenerateCode",
+		"command" : 1
+	},
+	// empty keys are ignored
+	"" : {},
+	// for an array with objects will be created one model with set of properties
+	// from all objects in the array
 	"children":
 	[
 		{
-			"@CLASS_NAME" : "DataMode2",
+			// if @CLASS_NAME is commented/undefined the plugin will search CLASS_NAME in other elements of array and the first found name will be applied
+			//"@CLASS_NAME" : "DataMode2",
 			"@BASE_CLASS_NAME" : "DataModel",
-			"caption" : "GenerateCode",
-			"command" : 1
+			//"caption" : "some caption value",
+			"number" : 1
 		},
 		{
 			"@CLASS_NAME" : "DataMode3",
 			"@BASE_CLASS_NAME" : "DataModel",
-			"caption" : "GenerateCode",
-			"command" : 1,
+			// if property is equal null it will be considered as
+			// nullable property of type 'id'
+			"caption" : null,
+			"number" : 1,
 			"user_defaults" : {
 				"some_property" : "some value"
 			}
 		},
 		{
-			"caption" : "GenerateCodeForARC",
-			"command" : 1.4
+			// if nullable property (node above) has value in other node,
+			// its type will be determined on the value,
+			// order of values is not important
+			"caption" : "some caption value",
+			"number" : 1.4
 		},
 		{
-
+			"image" : null
 		}
 	]
 }

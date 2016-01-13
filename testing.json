@@ -18,12 +18,20 @@
 	"base_json_object" 		: {
 		"@CLASS_NAME" : "DataModel",
 		"caption" : "GenerateCode",
-		"command" : 1
+		"rating" : 1,
+		"value" : 12
 	},
 	"json_object" 		: {
+		"@CLASS_NAME" : "ExtendedDataModel",
 		"@BASE_CLASS_NAME" : "DataModel",
 		"caption" : "GenerateCode",
-		"command" : 1
+		"rating" : 1,
+		"value" : "text"
+	},
+	"other_object" : {
+		"@CLASS_NAME" : "ExtendedDataModel2",
+		"@BASE_CLASS_NAME" : "ExtendedDataModel",
+		"price" : 20.0
 	},
 	// empty keys are ignored
 	"" : {},
@@ -32,19 +40,22 @@
 	"children":
 	[
 		{
-			// if @CLASS_NAME is commented/undefined the plugin will search CLASS_NAME in other elements of array and the first found name will be applied
+			// if @CLASS_NAME is commented/undefined the plugin will search
+			// CLASS_NAME in other elements of array and the first found name will be applied
 			//"@CLASS_NAME" : "DataMode2",
-			"@BASE_CLASS_NAME" : "DataModel",
+			"@BASE_CLASS_NAME" : "ExtendedDataModel",
 			//"caption" : "some caption value",
 			"number" : 1
 		},
 		{
-			"@CLASS_NAME" : "DataMode3",
-			"@BASE_CLASS_NAME" : "DataModel",
+			"@CLASS_NAME" : "ExtendedDataModel2",
+			// nodes of a list are parsed in order so following property will be ignored
+			"@BASE_CLASS_NAME" : "DataModel2",
 			// if property is equal null it will be considered as
 			// nullable property of type 'id'
 			"caption" : null,
 			"number" : 1,
+			"value" : null,
 			"user_defaults" : {
 				"some_property" : "some value"
 			}

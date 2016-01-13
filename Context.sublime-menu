@@ -1,32 +1,49 @@
 [
 	{
-		"id" : "json_to_objc",
-		"caption" : "JSON to Objective-C",
+		"id" : "json_to_objc_convert_case",
+		"caption" : "Convert Case (JTOC)",
 		"children":
 		[
 			{
-				"id" : "json_to_objc_convert_case",
-				"caption" : "Convert Case",
-				"children":
-				[
-					{
-						"caption" : "Snake Case",
-						"command" : "json_to_objc_snake_case"
-					},
-					{
-						"caption" : "Camel Case",
-						"command" : "json_to_objc_camel_case"
-					},
-					{
-						"caption" : "Pascal Case",
-						"command" : "json_to_objc_pascal_case"
-					}
-				]
+				"caption" : "Snake Case (snake_case)",
+				"command" : "snake_case"
 			},
-			// {
-			// 	"caption" : "Pretty Print (sublime build-in style)",
-			// 	"command" : "json_to_objc_pretty_print"
-			// },
+			{
+				"caption" : "Camel Case (camelCase)",
+				"command" : "camel_case"
+			},
+			{
+				"caption" : "Pascal Case (PascalCase)",
+				"command" : "pascal_case"
+			},
+			{	"caption": "-", "id": "json_to_objc_separator" },
+			{
+				"caption" : "Title Case (TitleCase eg => Titlecase Eg)",
+				"command" : "title_case"
+			},
+			{
+				"caption" : "Upper Case (UPPER CASE)",
+				"command" : "upper_case"
+			},
+			{
+				"caption" : "Lower Case (lower case)",
+				"command" : "lower_case"
+			},
+			{
+				"caption" : "Swap Case (Swap Case <=> sWAP cASE)",
+				"command" : "swap_case"
+			}
+		]
+	},
+	{
+		"id" : "json_to_objc",
+		"caption" : "JSON to Objective-C (JTOC)",
+		"children":
+		[
+			{
+				"caption" : "Pretty Print (sublime build-in style)",
+				"command" : "json_to_objc_pretty_print"
+			},
 			{
 				"caption" : "Generate Models",
 				"command" : "json_to_objc"

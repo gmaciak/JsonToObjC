@@ -264,7 +264,7 @@ class JsonToObjcCommand(JsonToObjcBaseCommand):
 			if (className is None):
 				if (self.conversionSettings.allowPropertyKeyAsClassName
 					and jsonKey is not None):
-					className = ConversionSettings.to_pascal_case(jsonKey)
+					className = TextConverterCommand.to_pascal_case(jsonKey)
 					className = self.prefixed_class_name(className)
 				else:
 					print("default class name: ", Default().className)
@@ -412,9 +412,12 @@ class JsonToObjcPrettyPrintCommand(TextConverterCommand):
 		selection = self.view.sel()
 		for region in selection:
 			region_text = self.view.substr(region)
+			print("region_text",region_text)
 			try:
 				obj = sublime.decode_value(region_text)
+				print("obj",obj)
 				converted_text = sublime.encode_value(obj, True)
 				self.view.replace(edit, region, converted_text)
-			except ValueError:
+			except ValueError as err:
+				print("ValueError",err)
 				self.show_exception()

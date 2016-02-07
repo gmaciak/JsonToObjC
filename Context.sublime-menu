@@ -1,41 +1,5 @@
 [
 	{
-		"id" : "json_to_objc_convert_case",
-		"caption" : "Convert Case (JTOC)",
-		"children":
-		[
-			{
-				"caption" : "Snake Case (snake_case)",
-				"command" : "snake_case"
-			},
-			{
-				"caption" : "Camel Case (camelCase)",
-				"command" : "camel_case"
-			},
-			{
-				"caption" : "Pascal Case (PascalCase)",
-				"command" : "pascal_case"
-			},
-			{	"caption": "-", "id": "json_to_objc_separator" },
-			{
-				"caption" : "Title Case (TitleCase eg => Titlecase Eg)",
-				"command" : "title_case"
-			},
-			{
-				"caption" : "Upper Case (UPPER CASE)",
-				"command" : "upper_case"
-			},
-			{
-				"caption" : "Lower Case (lower case)",
-				"command" : "lower_case"
-			},
-			{
-				"caption" : "Swap Case (Swap Case <=> sWAP cASE)",
-				"command" : "swap_case"
-			}
-		]
-	},
-	{
 		"id" : "json_to_objc",
 		"caption" : "JSON to Objective-C (JTOC)",
 		"children":
@@ -80,4 +44,69 @@
 	// 		}
 	// 	]
 	// }
+
+	// Access to additional (embedded) TextConverter command. Comment to disable.
+	// Text Converter may be installed stand alone. Because of fact that ids of
+	// menus are the same only one copy of menu will be visible
+	,{
+		"caption" : "Text Converter",
+		"id" : "kk_text_converter",
+		"children":
+		[
+			{
+				"caption" : "Snake Case (snake_case)",
+				"id" : "kk_text_converter_snake_case",
+				"command" : "snake_case"
+			},
+			{
+				"caption" : "Camel Case (camelCase)",
+				"id" : "kk_text_converter_camel_case",
+				"command" : "camel_case"
+			},
+			{
+				"caption" : "Pascal Case (PascalCase)",
+				"id" : "kk_text_converter_pascal_case",
+				"command" : "pascal_case"
+			},
+			{
+				"caption" : "Swap Spaces With Underscores (Swap Spaces <=> Swap_Spaces)",
+				"id" : "kk_text_converter_swap_spaces_with_underscores",
+				"command" : "swap_spaces_with_underscores",
+				"args": {
+			      "first_separator": " ",
+			      "second_separator": "_"
+			    }
+			},
+			{
+				"caption" : "Reduce Multiple White Spaces",
+				"id" : "kk_text_converter_reduce_multiple_white_spaces",
+				"command" : "reduce_multiple_white_spaces",
+				"args": {
+					// first character is the one to which all will be reduced
+					"characters": [" ", "\t"] 
+			    }
+			},
+			{	"caption": "-", "id": "json_to_objc_separator" },
+			{
+				"caption" : "Title Case (TitleCase eg => Titlecase Eg)",
+				"id" : "title_case",
+				"command" : "title_case"
+			},
+			{
+				"caption" : "Upper Case (UPPER CASE)",
+				"id" : "upper_case",
+				"command" : "upper_case"
+			},
+			{
+				"caption" : "Lower Case (lower case)",
+				"id" : "lower_case",
+				"command" : "lower_case"
+			},
+			{
+				"caption" : "Swap Case (Swap Case <=> sWAP cASE)",
+				"id" : "swap_case",
+				"command" : "swap_case"
+			}
+		]
+	}
 ]

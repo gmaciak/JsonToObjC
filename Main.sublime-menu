@@ -11,7 +11,7 @@
                             {
                                 "caption": "Settings – Default", 
                                 "args": {
-                                    "file": "${packages}/Pretty JSON/Base File.sublime-settings"
+                                    "file": "${packages}/JsonToObjC/Base File.sublime-settings"
                                 }, 
                                 "command": "open_file"
                             }, 

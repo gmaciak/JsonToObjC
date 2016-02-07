@@ -1,29 +1,41 @@
 import sublime, sublime_plugin, string, re, sys, os
 
 sys.path.append(os.path.dirname(__file__))
-from kk_base_plugin_command import *
+from kk_plugin_command_base_v1_1 import *
 
 class TextConverterCommand(BasePluginCommand):
 	@staticmethod
-	def reduce_mulitple_word_separators(text, sep=' '):
-		while "  " in text:
-			text = text.replace(sep*2, sep)
-			print("reduced multiple '{}': '{}'".format(sep,text))
-		return text
+	def reduce_mulitple_word_separators(s, sep=' '):
+		while "  " in s:
+			s = s.replace(sep*2, sep)
+		return s
 
 	@staticmethod
-	def change_word_separator(sep, newSep):
-		return s.replace(sep, newSep)
+	def reduce_multiple_white_spaces(s, characters={' ', '\t'}):
+		baseChar = characters[0] if len(characters)>0 else ' '
+		for char in characters:
+			s = s.replace(char, baseChar)
+		s = TextConverterCommand.reduce_mulitple_word_separators(s, baseChar)
+		return s
+
+	@staticmethod
+	def change_word_separator(s, separator, new_separator):
+		return s.replace(separator, new_separator)
+
+	@staticmethod
+	def swap_word_separators(s, first_separator=' ', second_separator='_'):
+		if first_separator in s:
+			return s.replace(first_separator, second_separator)
+		else:
+			return s.replace(second_separator, first_separator)
 
 	@staticmethod
 	def normalize_string(s, sep=' '):
-		print("normalize_string {}".format(s))
-		if '\t' in s:
-			s = s.replace('\t', sep)
-			print("replaced '\\t' '{}'".format(s))
-		if '_' in s:
-			s = s.replace('_', sep)
-			print("replaced '_' '{}'".format(s))
+		s = s.strip()
+		for ch in ['_','\t','<','=','>','-','+','(',')','!','@','#','$','%','^',
+		'&','*','|','\\','/','?',',','.','\'','"',':',';','{','}','[',']','`','~']:
+			if ch in s:
+				s = s.replace(ch, sep)
 		return TextConverterCommand.reduce_mulitple_word_separators(s,sep)
 
 	@staticmethod
@@ -41,25 +53,14 @@ class TextConverterCommand(BasePluginCommand):
 
 	@staticmethod
 	def to_snake_case(s):
-		print("to_snake_case {}".format(s))
-		return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s).lower()
+		s = TextConverterCommand.normalize_string(s)
+		return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s).lower().replace(' ', "_")
 
 	@staticmethod
 	def to_pascal_case(s):
+		s = TextConverterCommand.normalize_string(s)
 		if s and len(s) > 0:
 			result = s[0].upper()
 			if len(s) > 1: result += TextConverterCommand.to_camel_case(s)[1:]
 			return result
 		return s
-
-class SnakeCaseCommand(TextConverterCommand):
-	def run(self, edit):
-		self.preform_on_selection(edit, TextConverterCommand.to_snake_case)
-
-class CamelCaseCommand(TextConverterCommand):
-	def run(self, edit):
-		self.preform_on_selection(edit, TextConverterCommand.to_camel_case)
-
-class PascalCaseCommand(TextConverterCommand):
-	def run(self, edit):
-		self.preform_on_selection(edit, TextConverterCommand.to_pascal_case)

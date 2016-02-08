@@ -7,21 +7,147 @@
 			{
 				"caption" : "Pretty Print (sublime build-in style)",
 				"command" : "json_to_objc_pretty_print"
-			},
-			{
+			}
+			,{
 				"caption" : "Generate Models",
 				"command" : "json_to_objc"
-			},
-			{
+			}
+			,{
 				"caption" : "New conversion template file",
 				"command" : "json_to_objc_new_template",
 				"args": {
-			      "add_output_templates_to_new_conversion_template": true
-			    }
-			},
-			{
+				  "add_output_templates_to_new_conversion_template": true
+				}
+			}
+			,{
 				"caption" : "New conversion template file with settings only",
 				"command" : "json_to_objc_new_template"
+			}
+			,{
+				"caption" : "Generate Models (FAM)",
+				"command" : "json_to_objc",
+				"args": {
+					// overrides default settings
+					"conversion_settings" : {
+						// class of main json object used if optional
+						// @CLASS_NAME key in main json object is not defined
+						"default_root_model_class"		: "DataSource",
+						"arc_enabled"					: false,
+
+						// for nullable objects set property to nil instead of NSNull, default is true
+						"use_nil_instead_of_null_object" : false,
+
+						// use copy instead retain or strong for strings:
+						"copy_as_string_reference_type"	: false,
+
+						// add @synthesize for properties, implicitly synthesized property has ivar name '_propertyName', when explicitly synthesized has ivar name "propertyName"
+						"add_synthesize_clause"			: false,
+
+						"add_standard_copyright_comment": false,
+
+						"sort_properties_by_name"		: true,
+
+						// Templates. If you change them do it carefully:
+						"template_h_file"				: "${copyright}#import <Foundation/Foundation.h>\n\n@interface ${class_name} : ${base_class_name}\n\n${properties_declaration}\n${designed_initializer}@end\n",
+
+						"template_h_property" : "@property(nonatomic,readwrite,${reference_type}) ${type} ${name};\n",
+
+						"template_h_designed_initializer" : "-(instancetype)initWithJSON:(NSDictionary*)json;\n\n",
+
+						"template_m_file"				: "${copyright}#import \"${class_name}.h\"\n\n@implementation ${class_name}\n\n${synthesizes}${dealloc}-(id)initWithJSON:(NSDictionary*)${json_dictionary_name} {\n\tself = ${super_init_method};\n\tif (self) {\n${init_content}\t}\n\treturn self;\n}\n\n@end",
+
+						"template_m_default_super_init_method" : "[super init]",
+						"template_m_inherited_super_init_method" : "[super initWithJSON:${json_dictionary_name}]",
+
+						// dealloc templates
+						"template_m_dealloc_method" 				: "-(void)dealloc {\n${dealloc_code}\t[super dealloc];\n}\n\n",
+
+						"template_m_dealloc_reference_removing" : "\tself.${name} = nil;\n",
+
+						"template_m_synthesize" : "@synthesize ${name};\n",
+
+						"template_m_property_initialization" : "\t\tself.${name} = [${json_dictionary_name} objectForKey:@\"${json_key}\"];\n",
+						"template_m_non_object_property_initialization" : "\t\tself.${name} = [[${json_dictionary_name} objectForKey:@\"${json_key}\"] ${value_getter_name}];\n",
+
+						"template_m_nullable_property_update" : "\t\tif ([self.${name} isKindOfClass:[NSNull class]]) self.${name} = nil;\n",
+					}
+				}
+			}
+			,{
+				"caption" : "New conversion template file (FAM)",
+				"command" : "json_to_objc_new_template",
+				"args": {
+				  "add_output_templates_to_new_conversion_template": true,
+				  "conversion_settings" : {
+						// default model root class
+						"default_root_class"			: "NSObject",
+
+						// class of main json object used if optional
+						// @CLASS_NAME key in main json object is not defined
+						"default_root_model_class"		: "DataSource",
+						"arc_enabled"					: false,
+						"number_as_object"				: false,
+						"boolean_as_object"				: false,
+
+						// use property key istead of default model class name
+						// (which is xcode snipped token <#class_name#>)
+						// if @CLASS_NAME not defined
+						"allow_property_key_as_class_name" : true,
+
+						// by default property names are created from keys by converting to camel case and removeing undersocres
+						"use_json_keys_as_property_names" : false,
+
+						// for nullable objects set property to nil instead of NSNull, default is true
+						"use_nil_instead_of_null_object" : false,
+
+						// use copy instead retain or strong for strings:
+						"copy_as_string_reference_type"	: false,
+
+						// add @synthesize for properties, implicitly synthesized property has ivar name '_propertyName', when explicitly synthesized has ivar name "propertyName"
+						"add_synthesize_clause"			: false,
+
+						"add_standard_copyright_comment": false,
+
+						"sort_properties_by_name"		: true,
+
+						// Templates. If you change them do it carefully:
+						"template_h_file"				: "${copyright}#import <Foundation/Foundation.h>\n\n@interface ${class_name} : ${base_class_name}\n\n${properties_declaration}\n${designed_initializer}@end\n",
+
+						"template_h_copyright_comment"	: "//\n//  ${class_name}.h\n//  ${project_name}\n//\n//  Created by ${creator} on ${date}.\n//  Copyright (c) ${year} ${organization}. All rights reserved.\n//\n\n",
+
+						"template_h_property" : "@property(nonatomic,readwrite,${reference_type}) ${type} ${name};\n",
+
+						"template_h_designed_initializer" : "-(instancetype)initWithJSON:(NSDictionary*)json;\n\n",
+
+						"template_m_file"				: "${copyright}#import \"${class_name}.h\"\n\n@implementation ${class_name}\n\n${synthesizes}${dealloc}-(id)initWithJSON:(NSDictionary*)${json_dictionary_name} {\n\tself = ${super_init_method};\n\tif (self) {\n${init_content}\t}\n\treturn self;\n}\n\n@end",
+
+						"template_m_copyright_comment"	: "//\n//  ${class_name}.m\n//  ${project_name}\n//\n//  Created by ${creator} on ${date}.\n//  Copyright (c) ${year} ${organization}. All rights reserved.\n//\n\n",
+
+						"template_m_default_super_init_method" : "[super init]",
+						"template_m_inherited_super_init_method" : "[super initWithJSON:${json_dictionary_name}]",
+
+						// dealloc templates
+						"template_m_dealloc_method" 				: "-(void)dealloc {\n${dealloc_code}\t[super dealloc];\n}\n\n",
+
+						"template_m_dealloc_reference_removing" : "\tself.${name} = nil;\n",
+
+						"template_m_synthesize" : "@synthesize ${name};\n",
+
+						"template_m_property_initialization" : "\t\tself.${name} = [${json_dictionary_name} objectForKey:@\"${json_key}\"];\n",
+						"template_m_non_object_property_initialization" : "\t\tself.${name} = [[${json_dictionary_name} objectForKey:@\"${json_key}\"] ${value_getter_name}];\n",
+
+						"template_m_arc_strong_property_initialization" : "\t\t${ivar} = [${json_dictionary_name} objectForKey:@\"${json_key}\"];\n",
+						"template_m_arc_copy_property_initialization" : "\t\t${ivar} = [[${json_dictionary_name} objectForKey:@\"${json_key}\"] copy];\n",
+						"template_m_arc_non_object_property_initialization" : "\t\t${ivar} = [[${json_dictionary_name} objectForKey:@\"${json_key}\"] ${value_getter_name}];\n",
+
+						"template_m_nullable_property_update" : "\t\tif ([self.${name} isKindOfClass:[NSNull class]]) self.${name} = nil;\n",
+
+						// optional:
+						"project_name" 					: "__PROJECT_NAME__",
+						"creator" 						: "__CREATOR__",
+						"organization" 					: "__ORGANIZATION__",
+					}
+				}
 			}
 		]
 	}
@@ -73,9 +199,9 @@
 				"id" : "kk_text_converter_swap_spaces_with_underscores",
 				"command" : "swap_spaces_with_underscores",
 				"args": {
-			      "first_separator": " ",
-			      "second_separator": "_"
-			    }
+				  "first_separator": " ",
+				  "second_separator": "_"
+				}
 			},
 			{
 				"caption" : "Reduce Multiple White Spaces",
@@ -83,8 +209,8 @@
 				"command" : "reduce_multiple_white_spaces",
 				"args": {
 					// first character is the one to which all will be reduced
-					"characters": [" ", "\t"] 
-			    }
+					"characters": [" ", "\t"]
+				}
 			},
 			{	"caption": "-", "id": "json_to_objc_separator" },
 			{
@@ -110,3 +236,4 @@
 		]
 	}
 ]
+

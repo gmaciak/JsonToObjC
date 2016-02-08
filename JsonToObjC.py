@@ -7,11 +7,20 @@ from json_to_objc_new_template import *
 
 class JsonToObjcCommand(JsonToObjcBaseCommand):
 
-	def run(self, edit):
+	def run(self, edit, **kvargs):
 		allContentRegion = sublime.Region(0, self.view.size())
 		if not allContentRegion.empty():
 			# settings
-			settingsJSON = self.view.settings().get(KEY_SETTINGS_CONVERSION_SETTINGS, dict())
+			# try to load settings from args if provided
+			if KEY_SETTINGS_CONVERSION_SETTINGS in kvargs:
+				settingsJSON = kvargs[KEY_SETTINGS_CONVERSION_SETTINGS]
+				if type(settingsJSON) is not dict:
+					settingsJSON = None;
+
+			# load default settings if not provided in args
+			if settingsJSON == None:
+				settingsJSON = self.view.settings().get(KEY_SETTINGS_CONVERSION_SETTINGS, dict())
+			
 			
 			# Get file content
 			text = self.view.substr(allContentRegion)

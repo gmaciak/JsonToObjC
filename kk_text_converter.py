@@ -59,8 +59,32 @@ class TextConverterCommand(BasePluginCommand):
 	@staticmethod
 	def to_pascal_case(s):
 		s = TextConverterCommand.normalize_string(s)
+		print(s)
 		if s and len(s) > 0:
-			result = s[0].upper()
-			if len(s) > 1: result += TextConverterCommand.to_camel_case(s)[1:]
-			return result
+			print(string.capwords(s, sep=' ').replace(' ', ''))
+			return string.capwords(s, sep=' ').replace(' ', '')
 		return s
+
+
+
+
+
+class SnakeCaseCommand(TextConverterCommand):
+	def run(self, edit):
+		self.preform_on_selection(edit, TextConverterCommand.to_snake_case)
+
+class CamelCaseCommand(TextConverterCommand):
+	def run(self, edit):
+		self.preform_on_selection(edit, TextConverterCommand.to_camel_case)
+
+class PascalCaseCommand(TextConverterCommand):
+	def run(self, edit):
+		self.preform_on_selection(edit, TextConverterCommand.to_pascal_case)
+
+class ReduceMultipleWhiteSpacesCommand(TextConverterCommand):
+	def run(self, edit, **args):
+		self.preform_on_selection_with_args(edit, TextConverterCommand.reduce_multiple_white_spaces,args)
+
+class SwapSpacesWithUnderscoresCommand(TextConverterCommand):
+	def run(self, edit, **args):
+		self.preform_on_selection_with_args(edit, TextConverterCommand.swap_word_separators, args)

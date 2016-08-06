@@ -273,7 +273,7 @@ class JsonToObjcCommand(JsonToObjcBaseCommand):
 			if (className is None):
 				if (self.conversionSettings.allowPropertyKeyAsClassName
 					and jsonKey is not None):
-					className = TextConverterCommand.to_pascal_case(jsonKey)
+					className = KKTextConverterCommand.to_pascal_case(jsonKey)
 					className = self.prefixed_class_name(className)
 				else:
 					print("default class name: ", Default().className)
@@ -416,7 +416,7 @@ class JsonToObjcCommand(JsonToObjcBaseCommand):
 					newFileView.set_name("{}.m".format(fileName))
 				self.change_syntax(newFileView, "objc")
 
-class JsonToObjcPrettyPrintCommand(TextConverterCommand):
+class JsonToObjcPrettyPrintCommand(KKTextConverterCommand):
 	def run(self, edit):
 		selection = self.view.sel()
 		for region in selection:

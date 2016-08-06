@@ -1,6 +1,6 @@
 import sublime, sublime_plugin, sys
 
-class BasePluginCommand(sublime_plugin.TextCommand):
+class KKBasePluginCommand(sublime_plugin.TextCommand):
 	""" Case converstion command base class """
 	def change_syntax(self, view = None, lang = None):
 		""" Changes syntax to JSON if it is plain text """

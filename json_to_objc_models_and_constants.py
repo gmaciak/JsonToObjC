@@ -20,7 +20,7 @@ from kk_text_converter import *
 def pretty_printed(value):
 	return sublime.encode_value(value, True)
 
-class JsonToObjcBaseCommand(BasePluginCommand):
+class JsonToObjcBaseCommand(KKBasePluginCommand):
 	pass
 
 class Default(dict):
@@ -77,8 +77,8 @@ class ConversionSettings(Default):
 			
 			# settings values (overrid the defaults)
 			for key, value in iter(settings.items()):
-				#print("property: {} ({})".format(TextConverterCommand.to_camel_case(key), key))
-				propertyName = TextConverterCommand.to_camel_case(key)
+				#print("property: {} ({})".format(KKTextConverterCommand.to_camel_case(key), key))
+				propertyName = KKTextConverterCommand.to_camel_case(key)
 				setattr(self, propertyName, value) # if propertyName in vars(self)
 
 			# dependent values
@@ -94,17 +94,17 @@ class ConversionSettings(Default):
 class TokensMap(Default):
 	"""  """
 	def __getattr__(self, key):
-		key = TextConverterCommand.to_snake_case(key)
+		key = KKTextConverterCommand.to_snake_case(key)
 		return self[key]
 
 	def __setattr__(self, key, value):
-		key = TextConverterCommand.to_snake_case(key)
+		key = KKTextConverterCommand.to_snake_case(key)
 		self[key] = value
 
 class TransparentTokensMap(TokensMap):
 	"""  """
 	def __missing__(self, key):
-		return "${{{}}}".format(TextConverterCommand.to_snake_case(key))
+		return "${{{}}}".format(KKTextConverterCommand.to_snake_case(key))
 
 class DescriptorsList(list):
 	"""docstring for DescriptorsList"""
@@ -176,7 +176,7 @@ class PropertyDescriptor(Default):
 		super(PropertyDescriptor, self).__init__()
 		self.jsonKey = name;
 		if not settings.useJsonKeysAsPropertyNames and not name.startswith("@"):
-			self.name = TextConverterCommand.to_camel_case(name)
+			self.name = KKTextConverterCommand.to_camel_case(name)
 		else:
 			self.name = name
 		self.value = value

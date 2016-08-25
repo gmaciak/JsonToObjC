@@ -3,26 +3,35 @@
         "id": "preferences", 
         "children": [
             {
-                "id": "package-settings", 
+                "caption": "JSON to Objective-C", 
                 "children": [
                     {
-                        "caption": "JSON to Objective-C", 
-                        "children": [
-                            {
-                                "caption": "Settings – Default", 
-                                "args": {
-                                    "file": "${packages}/JsonToObjC/Base File.sublime-settings"
-                                }, 
-                                "command": "open_file"
-                            }, 
-                            {
-                                "caption": "Settings – User", 
-                                "args": {
-                                    "file": "${packages}/User/Base File.sublime-settings"
-                                }, 
-                                "command": "open_file"
-                            }
-                        ]
+                        "caption": "Settings – Default", 
+                        "args": {
+                            "file": "${packages}/JsonToObjC/Base File.sublime-settings"
+                        }, 
+                        "command": "open_file"
+                    }, 
+                    {
+                        "caption": "Settings – User", 
+                        "args": {
+                            "file": "${packages}/User/Base File.sublime-settings"
+                        }, 
+                        "command": "open_file"
+                    },
+                    {
+                        "caption": "Context Menu – Default", 
+                        "args": {
+                            "file": "${packages}/JsonToObjC/Context.sublime-menu"
+                        }, 
+                        "command": "open_file"
+                    }, 
+                    {
+                        "caption": "Context Menu – User", 
+                        "args": {
+                            "file": "${packages}/User/JsonToObjC/Context.sublime-menu"
+                        }, 
+                        "command": "open_file"
                     }
                 ]
             }

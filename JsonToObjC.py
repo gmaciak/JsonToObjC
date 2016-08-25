@@ -11,6 +11,8 @@ class JsonToObjcCommand(JsonToObjcBaseCommand):
 		allContentRegion = sublime.Region(0, self.view.size())
 		if not allContentRegion.empty():
 			# settings
+			settingsJSON = None;
+			
 			# try to load settings from args if provided
 			if KEY_SETTINGS_CONVERSION_SETTINGS in kvargs:
 				settingsJSON = kvargs[KEY_SETTINGS_CONVERSION_SETTINGS]

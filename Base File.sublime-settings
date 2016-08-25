@@ -6,9 +6,9 @@
 		// class of main json object used if optional
 		// @CLASS_NAME key in main json object is not defined 
 		"default_root_model_class"		: "RootModel",
-		"arc_enabled"					: false,
-		"number_as_object"				: false,
-		"boolean_as_object"				: false,
+		"arc_enabled"					: true,
+		"number_as_object"				: true,
+		"boolean_as_object"				: true,
 
 		// use property key istead of default model class name
 		// (which is xcode snipped token <#class_name#>)
@@ -22,10 +22,10 @@
 		"use_nil_instead_of_null_object" : true,
 
 		// use copy instead retain or strong for strings:
-		"copy_as_string_reference_type"	: false,
+		"copy_as_string_reference_type"	: true,
 
 		// add @synthesize for properties, implicitly synthesized property has ivar name '_propertyName', when explicitly synthesized has ivar name "propertyName"
-		"add_synthesize_clause"			: true,
+		"add_synthesize_clause"			: false,
 
 		"add_standard_copyright_comment": true,
 
@@ -36,7 +36,7 @@
 
 		"template_h_copyright_comment"	: "//\n//  ${class_name}.h\n//  ${project_name}\n//\n//  Created by ${creator} on ${date}.\n//  Copyright (c) ${year} ${organization}. All rights reserved.\n//\n\n",
 
-		"template_h_property" : "@property(${reference_type}) ${type} ${name};\n",
+		"template_h_property" : "@property(nonatomic,${reference_type}) ${type} ${name};\n",
 
 		"template_h_designed_initializer" : "-(instancetype)initWithJSON:(nullable NSDictionary*)json;\n\n",
 

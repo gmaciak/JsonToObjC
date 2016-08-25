@@ -5,7 +5,7 @@ Sublime 3 plugin to generate Objective-C data models from JSON
 
 ## Install:
 
-1. Clone or dwonload and unzip the files to following directory:
+1. Clone or dwonload and unzip the files to Sublime Text 3 Packages directory:
 
   `~/Library/Application\ Support/Sublime\ Text\ 3/Packages/JsonToObjC`
 

@@ -5,8 +5,7 @@ Sublime 3 plugin to generate Objective-C data models from JSON
 
 ## Install:
 
-1. Clone or dwonload and unzip the files to Sublime Text 3 Packages directory:
-
+1. Clone or dwonload and unzip the files to Sublime Text 3 Packages directory:  
   `~/Library/Application\ Support/Sublime\ Text\ 3/Packages/JsonToObjC`
 
 2. You may need to restart the Sublime Text 3 to reload the plugins
@@ -32,13 +31,13 @@ Tere are three ways to do that.
 1. Modifying and overriding default configuration.
   To do so:
   * Open `Settings - Default` file using Sublime Text Main Menu:
-  
-    `Sublime Text/Preferences/JSON to Objective-C/Settings - Default`
+
+    	`Sublime Text/Preferences/JSON to Objective-C/Settings - Default`
     
   * Copy whole JSON text to clipboard
   * Open `Settings - User` file
   
-    `Sublime Text/Preferences/JSON to Objective-C/Settings - User`
+    	`Sublime Text/Preferences/JSON to Objective-C/Settings - User`
     
   * Paste previously copied json to the newly opened tab/file
   * Modyfy settings as you need.
@@ -50,7 +49,9 @@ Tere are three ways to do that.
 
 ## Default generator configuration
 
-You can find default donfiguration of the plugin in menu `Sublime Text/Preferences/JSON to Objective-C/Settings - Default` and it looks like this:
+You can find default donfiguration of the plugin in menu  
+`Sublime Text/Preferences/JSON to Objective-C/Settings - Default`  
+and it looks like this:
 
 ```JavaScript
 {
@@ -125,3 +126,33 @@ You can find default donfiguration of the plugin in menu `Sublime Text/Preferenc
 	}
 }
 ```
+### Available tokens:
+```
+base_class_name, class_name, copyright, creator, date, dealloc_code, dealloc,
+designed_initializer,  init_content, ivar, json_dictionary_name, json_key,
+name, organization, project_name, properties_declaration, reference_type,
+super_init_method, synthesizes, type, value_getter_name, year
+```
+
+`${base_class_name}` - replaced by base class name or `default_root_class` value.  
+`${class_name}` - replaced by class name created according to the settings.  
+`${copyright}` - replaced with   
+`${creator}` - replaced with   
+`${date}` - replaced with   
+`${dealloc_code}` - replaced with   
+`${dealloc}` - replaced with   
+`${designed_initializer}` - replaced with   
+`${init_content}` - replaced with   
+`${ivar}` - replaced with   
+`${json_dictionary_name}` - replaced with   
+`${json_key}` - replaced with   
+`${name}` - replaced with   
+`${organization}` - replaced with   
+`${project_name}` - replaced with   
+`${properties_declaration}` - replaced with   
+`${reference_type}` - replaced with   
+`${super_init_method}` - replaced with   
+`${synthesizes}` - replaced with   
+`${type}` - replaced with   
+`${value_getter_name}` - replaced with   
+`${year}` - replaced with   
